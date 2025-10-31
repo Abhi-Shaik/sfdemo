@@ -52,8 +52,6 @@ export async function handleSignIn(prevState: any, formData: FormData) {
 
     // Check if sign in was successful
     if (result && result.isSignedIn) {
-      // Add a small delay to ensure cookies are properly set
-      await new Promise(resolve => setTimeout(resolve, 100));
       redirect('/dashboard');
     }
 

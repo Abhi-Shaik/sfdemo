@@ -9,10 +9,8 @@ export const { runWithAmplifyServerContext } = createServerRunner({
 
 // Server-side auth wrapper functions
 export async function serverSignUp(username: string, password: string, email: string) {
-  const cookieStore = await cookies();
-  
   return await runWithAmplifyServerContext({
-    nextServerContext: { cookies: cookieStore },
+    nextServerContext: { cookies },
     operation: async (contextSpec) => {
       // On server, we configure Amplify with the context
       const { Amplify } = await import('aws-amplify');
@@ -33,10 +31,8 @@ export async function serverSignUp(username: string, password: string, email: st
 }
 
 export async function serverConfirmSignUp(username: string, confirmationCode: string) {
-  const cookieStore = await cookies();
-  
   return await runWithAmplifyServerContext({
-    nextServerContext: { cookies: cookieStore },
+    nextServerContext: { cookies },
     operation: async (contextSpec) => {
       const { Amplify } = await import('aws-amplify');
       Amplify.configure(outputs, { ssr: true });
@@ -50,13 +46,10 @@ export async function serverConfirmSignUp(username: string, confirmationCode: st
 }
 
 export async function serverSignIn(username: string, password: string) {
-  const cookieStore = await cookies();
-  
   return await runWithAmplifyServerContext({
-    nextServerContext: { cookies: cookieStore },
+    nextServerContext: { cookies },
     operation: async (contextSpec) => {
       const { Amplify } = await import('aws-amplify');
-      const { fetchAuthSession } = await import('aws-amplify/auth');
       
       Amplify.configure(outputs, { ssr: true });
       
@@ -66,24 +59,14 @@ export async function serverSignIn(username: string, password: string) {
         password,
       });
       
-      // Fetch and establish the session to ensure cookies are set
-      try {
-        const session = await fetchAuthSession();
-        console.log('Session established:', session.tokens !== undefined);
-      } catch (error) {
-        console.error('Session fetch error:', error);
-      }
-      
       return signInResult;
     },
   });
 }
 
 export async function serverSignOut() {
-  const cookieStore = await cookies();
-  
   return await runWithAmplifyServerContext({
-    nextServerContext: { cookies: cookieStore },
+    nextServerContext: { cookies },
     operation: async (contextSpec) => {
       const { Amplify } = await import('aws-amplify');
       Amplify.configure(outputs, { ssr: true });
@@ -94,10 +77,8 @@ export async function serverSignOut() {
 }
 
 export async function serverResendSignUpCode(username: string) {
-  const cookieStore = await cookies();
-  
   return await runWithAmplifyServerContext({
-    nextServerContext: { cookies: cookieStore },
+    nextServerContext: { cookies },
     operation: async (contextSpec) => {
       const { Amplify } = await import('aws-amplify');
       Amplify.configure(outputs, { ssr: true });
