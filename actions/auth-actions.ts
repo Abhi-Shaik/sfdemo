@@ -2,7 +2,6 @@
 
 import { serverSignUp, serverConfirmSignUp, serverSignIn, serverSignOut, serverResendSignUpCode } from '@/lib/amplify-server-client';
 import { redirect } from 'next/navigation';
-import { revalidatePath } from 'next/cache';
 
 export async function handleSignUp(prevState: any, formData: FormData) {
   try {
@@ -51,24 +50,30 @@ export async function handleSignIn(prevState: any, formData: FormData) {
 
     const result = await serverSignIn(email, password);
 
-    if (result?.isSignedIn) {
-      // Revalidate paths to clear any cached auth state
-      revalidatePath('/', 'layout');
-      revalidatePath('/dashboard');
-      
-      // Redirect to dashboard
+    // Check if sign in was successful
+    if (result && result.isSignedIn) {
+      // Add a small delay to ensure cookies are properly set
+      await new Promise(resolve => setTimeout(resolve, 100));
       redirect('/dashboard');
+    }
+
+    // Handle other sign-in steps (MFA, password change, etc.)
+    if (result?.nextStep) {
+      return {
+        success: false,
+        message: `Additional step required: ${result.nextStep.signInStep}`,
+      };
     }
 
     return {
       success: false,
-      message: 'Sign in failed - authentication incomplete',
+      message: 'Sign in failed',
     };
   } catch (error: any) {
     console.error('Sign in error:', error);
     return {
       success: false,
-      message: error.message || 'Failed to sign in. Please check your credentials.',
+      message: error.message || 'Failed to sign in',
     };
   }
 }
@@ -76,10 +81,6 @@ export async function handleSignIn(prevState: any, formData: FormData) {
 export async function handleSignOut() {
   try {
     await serverSignOut();
-    
-    // Revalidate to clear cached auth state
-    revalidatePath('/', 'layout');
-    
     redirect('/login');
   } catch (error: any) {
     return {

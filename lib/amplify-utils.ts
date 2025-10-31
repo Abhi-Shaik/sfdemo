@@ -1,13 +1,13 @@
 import { Amplify } from 'aws-amplify';
-import { amplifyConfig } from '@/lib/amplify-config';
+import outputs from '@/amplify_outputs.json';
 
-// Configure Amplify immediately when this module is imported
-// This ensures configuration happens before any component tries to use it
-Amplify.configure(amplifyConfig, {
-  ssr: true,
+// Configure Amplify for client-side (call once)
+Amplify.configure(outputs, {
+  ssr: true, // Enable SSR mode
 });
 
 export function configureAmplify() {
+  // Already configured above, but export function for compatibility
   return Amplify;
 }
 

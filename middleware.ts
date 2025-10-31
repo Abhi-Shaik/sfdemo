@@ -12,8 +12,7 @@ export async function middleware(request: NextRequest) {
         const session = await fetchAuthSession(contextSpec);
         return session.tokens !== undefined;
       } catch (error) {
-        // Log error details for debugging
-        console.error('Auth session error:', error);
+        console.log(error);
         return false;
       }
     },
@@ -29,11 +28,11 @@ export async function middleware(request: NextRequest) {
   }
 
   // User is not authenticated
-  // Allow access to public routes and test pages
-  const publicRoutes = ['/login', '/signup', '/', '/test-auth', '/test-config'];
-  const isPublicRoute = publicRoutes.some(route => request.nextUrl.pathname.startsWith(route));
-  
-  if (!isPublicRoute) {
+  if (
+    request.nextUrl.pathname !== '/login' &&
+    request.nextUrl.pathname !== '/signup' &&
+    request.nextUrl.pathname !== '/'
+  ) {
     // Redirect to login for protected routes
     return NextResponse.redirect(new URL('/login', request.url));
   }

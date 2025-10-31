@@ -1,22 +1,24 @@
 import { createServerRunner } from '@aws-amplify/adapter-nextjs';
-import { signUp, confirmSignUp, signIn, signOut, resendSignUpCode } from 'aws-amplify/auth';
+import { signUp as amplifySignUp, confirmSignUp as amplifyConfirmSignUp, signIn as amplifySignIn, signOut as amplifySignOut, resendSignUpCode as amplifyResendSignUpCode } from 'aws-amplify/auth';
 import { cookies } from 'next/headers';
 import outputs from '@/amplify_outputs.json';
 
-// Create server runner with Amplify configuration
-// Server runner uses the original Gen2 format from amplify_outputs.json
 export const { runWithAmplifyServerContext } = createServerRunner({
   config: outputs,
 });
 
 // Server-side auth wrapper functions
-// runWithAmplifyServerContext provides the context automatically
-// Auth functions work within the operation without needing contextSpec parameter
 export async function serverSignUp(username: string, password: string, email: string) {
+  const cookieStore = await cookies();
+  
   return await runWithAmplifyServerContext({
-    nextServerContext: { cookies },
+    nextServerContext: { cookies: cookieStore },
     operation: async (contextSpec) => {
-      return await signUp({
+      // On server, we configure Amplify with the context
+      const { Amplify } = await import('aws-amplify');
+      Amplify.configure(outputs, { ssr: true });
+      
+      return await amplifySignUp({
         username,
         password,
         options: {
@@ -31,10 +33,15 @@ export async function serverSignUp(username: string, password: string, email: st
 }
 
 export async function serverConfirmSignUp(username: string, confirmationCode: string) {
+  const cookieStore = await cookies();
+  
   return await runWithAmplifyServerContext({
-    nextServerContext: { cookies },
+    nextServerContext: { cookies: cookieStore },
     operation: async (contextSpec) => {
-      return await confirmSignUp({
+      const { Amplify } = await import('aws-amplify');
+      Amplify.configure(outputs, { ssr: true });
+      
+      return await amplifyConfirmSignUp({
         username,
         confirmationCode,
       });
@@ -43,33 +50,59 @@ export async function serverConfirmSignUp(username: string, confirmationCode: st
 }
 
 export async function serverSignIn(username: string, password: string) {
+  const cookieStore = await cookies();
+  
   return await runWithAmplifyServerContext({
-    nextServerContext: { cookies },
+    nextServerContext: { cookies: cookieStore },
     operation: async (contextSpec) => {
-      const result = await signIn({
+      const { Amplify } = await import('aws-amplify');
+      const { fetchAuthSession } = await import('aws-amplify/auth');
+      
+      Amplify.configure(outputs, { ssr: true });
+      
+      // Perform sign in
+      const signInResult = await amplifySignIn({
         username,
         password,
       });
       
-      return result;
+      // Fetch and establish the session to ensure cookies are set
+      try {
+        const session = await fetchAuthSession();
+        console.log('Session established:', session.tokens !== undefined);
+      } catch (error) {
+        console.error('Session fetch error:', error);
+      }
+      
+      return signInResult;
     },
   });
 }
 
 export async function serverSignOut() {
+  const cookieStore = await cookies();
+  
   return await runWithAmplifyServerContext({
-    nextServerContext: { cookies },
+    nextServerContext: { cookies: cookieStore },
     operation: async (contextSpec) => {
-      return await signOut();
+      const { Amplify } = await import('aws-amplify');
+      Amplify.configure(outputs, { ssr: true });
+      
+      return await amplifySignOut();
     },
   });
 }
 
 export async function serverResendSignUpCode(username: string) {
+  const cookieStore = await cookies();
+  
   return await runWithAmplifyServerContext({
-    nextServerContext: { cookies },
+    nextServerContext: { cookies: cookieStore },
     operation: async (contextSpec) => {
-      return await resendSignUpCode({
+      const { Amplify } = await import('aws-amplify');
+      Amplify.configure(outputs, { ssr: true });
+      
+      return await amplifyResendSignUpCode({
         username,
       });
     },
