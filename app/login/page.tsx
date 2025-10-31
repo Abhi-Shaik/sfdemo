@@ -1,9 +1,13 @@
 'use client';
 
-import { useFormState } from 'react-dom';
+import { useActionState } from 'react';
 import { handleSignIn } from '@/actions/auth-actions';
 import Link from 'next/link';
 import { useEffect } from 'react';
+import { configureAmplify } from '@/lib/amplify-utils';
+
+// Configure Amplify for client-side
+configureAmplify();
 
 const initialState = {
   success: false,
@@ -11,7 +15,7 @@ const initialState = {
 };
 
 export default function LoginPage() {
-  const [state, formAction] = useFormState(handleSignIn, initialState);
+  const [state, formAction] = useActionState(handleSignIn, initialState);
 
   useEffect(() => {
     if (state?.message) {

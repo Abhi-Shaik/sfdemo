@@ -1,9 +1,13 @@
 'use client';
 
-import { useFormState } from 'react-dom';
+import { useActionState } from 'react';
 import { handleSignUp, handleConfirmSignUp, handleResendCode } from '@/actions/auth-actions';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { configureAmplify } from '@/lib/amplify-utils';
+
+// Configure Amplify for client-side
+configureAmplify();
 
 const initialState = {
   success: false,
@@ -11,9 +15,9 @@ const initialState = {
 };
 
 export default function SignUpPage() {
-  const [signUpState, signUpAction] = useFormState(handleSignUp, initialState);
-  const [confirmState, confirmAction] = useFormState(handleConfirmSignUp, initialState);
-  const [resendState, resendAction] = useFormState(handleResendCode, initialState);
+  const [signUpState, signUpAction] = useActionState(handleSignUp, initialState);
+  const [confirmState, confirmAction] = useActionState(handleConfirmSignUp, initialState);
+  const [resendState, resendAction] = useActionState(handleResendCode, initialState);
   const [needsConfirmation, setNeedsConfirmation] = useState(false);
   const [email, setEmail] = useState('');
 
