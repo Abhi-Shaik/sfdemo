@@ -19,7 +19,8 @@ export default function SignUpPage() {
 
   useEffect(() => {
     if (signUpState?.success && signUpState?.nextStep === 'CONFIRM_SIGN_UP') {
-      setNeedsConfirmation(true);
+      // Use setTimeout to avoid synchronous setState in effect
+      setTimeout(() => setNeedsConfirmation(true), 0);
     }
   }, [signUpState]);
 
@@ -41,7 +42,7 @@ export default function SignUpPage() {
               Verify your email
             </h2>
             <p className="mt-2 text-center text-sm text-gray-600">
-              We've sent a verification code to your email
+              We&apos;ve sent a verification code to your email
             </p>
           </div>
 

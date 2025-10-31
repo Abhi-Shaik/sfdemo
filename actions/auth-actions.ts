@@ -1,6 +1,6 @@
 'use server';
 
-import { signIn, signUp, signOut, confirmSignUp, resendSignUpCode } from 'aws-amplify/auth/server';
+import { signUp, confirmSignUp, resendSignUpCode, signIn, signOut } from 'aws-amplify/auth';
 import { runWithAmplifyServerContext } from '@/lib/amplify-server-utils';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -10,19 +10,15 @@ export async function handleSignUp(prevState: any, formData: FormData) {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
-    const { isSignUpComplete, userId, nextStep } = await runWithAmplifyServerContext({
-      nextServerContext: { cookies },
-      operation: (contextSpec) =>
-        signUp(contextSpec, {
-          username: email,
-          password,
-          options: {
-            userAttributes: {
-              email,
-            },
-            autoSignIn: true,
-          },
-        }),
+    const { isSignUpComplete, userId, nextStep } = await signUp({
+      username: email,
+      password,
+      options: {
+        userAttributes: {
+          email,
+        },
+        autoSignIn: true,
+      },
     });
 
     return {
@@ -44,13 +40,9 @@ export async function handleConfirmSignUp(prevState: any, formData: FormData) {
     const email = formData.get('email') as string;
     const code = formData.get('code') as string;
 
-    await runWithAmplifyServerContext({
-      nextServerContext: { cookies },
-      operation: (contextSpec) =>
-        confirmSignUp(contextSpec, {
-          username: email,
-          confirmationCode: code,
-        }),
+    await confirmSignUp({
+      username: email,
+      confirmationCode: code,
     });
 
     return {
@@ -70,13 +62,9 @@ export async function handleSignIn(prevState: any, formData: FormData) {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
-    const { isSignedIn } = await runWithAmplifyServerContext({
-      nextServerContext: { cookies },
-      operation: (contextSpec) =>
-        signIn(contextSpec, {
-          username: email,
-          password,
-        }),
+    const { isSignedIn } = await signIn({
+      username: email,
+      password,
     });
 
     if (isSignedIn) {
@@ -97,11 +85,7 @@ export async function handleSignIn(prevState: any, formData: FormData) {
 
 export async function handleSignOut() {
   try {
-    await runWithAmplifyServerContext({
-      nextServerContext: { cookies },
-      operation: (contextSpec) => signOut(contextSpec),
-    });
-
+    await signOut();
     redirect('/login');
   } catch (error: any) {
     return {
@@ -115,12 +99,8 @@ export async function handleResendCode(prevState: any, formData: FormData) {
   try {
     const email = formData.get('email') as string;
 
-    await runWithAmplifyServerContext({
-      nextServerContext: { cookies },
-      operation: (contextSpec) =>
-        resendSignUpCode(contextSpec, {
-          username: email,
-        }),
+    await resendSignUpCode({
+      username: email,
     });
 
     return {
