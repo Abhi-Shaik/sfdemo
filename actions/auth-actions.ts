@@ -48,10 +48,20 @@ export async function handleSignIn(prevState: any, formData: FormData) {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
-    const { isSignedIn } = await serverSignIn(email, password);
+    const result = await serverSignIn(email, password);
 
-    if (isSignedIn) {
+    // Check if sign-in was successful
+    if (result.isSignedIn) {
+      // Force redirect after successful sign-in
       redirect('/dashboard');
+    }
+
+    // Handle MFA or other challenges
+    if (result.nextStep) {
+      return {
+        success: false,
+        message: `Sign in requires additional step: ${result.nextStep.signInStep}`,
+      };
     }
 
     return {
@@ -59,9 +69,10 @@ export async function handleSignIn(prevState: any, formData: FormData) {
       message: 'Sign in failed',
     };
   } catch (error: any) {
+    console.error('Sign in error:', error);
     return {
       success: false,
-      message: error.message || 'Failed to sign in',
+      message: error.message || 'Failed to sign in. Please check your credentials.',
     };
   }
 }
