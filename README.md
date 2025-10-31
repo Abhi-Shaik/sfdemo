@@ -46,9 +46,18 @@ npx ampx sandbox
 This will create your AWS Cognito User Pool and generate `amplify_outputs.json`.
 
 5. **Run the development server**
+
+For Chrome/Firefox:
 ```bash
 npm run dev
 ```
+
+**For Safari/WebKit browsers** (recommended):
+```bash
+npm run dev:https
+```
+
+> ⚠️ **Safari/WebKit Limitation**: Safari cannot use secure cookies on HTTP localhost. Use `npm run dev:https` for Safari development. See [SAFARI_WEBKIT_LIMITATION.md](./SAFARI_WEBKIT_LIMITATION.md) for details.
 
 Visit [http://localhost:3000](http://localhost:3000) to see your application.
 
