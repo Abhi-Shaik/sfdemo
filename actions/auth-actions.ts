@@ -1,8 +1,6 @@
 'use server';
 
-import { signUp, confirmSignUp, resendSignUpCode, signIn, signOut } from 'aws-amplify/auth';
-import { runWithAmplifyServerContext } from '@/lib/amplify-server-utils';
-import { cookies } from 'next/headers';
+import { serverSignUp, serverConfirmSignUp, serverSignIn, serverSignOut, serverResendSignUpCode } from '@/lib/amplify-server-client';
 import { redirect } from 'next/navigation';
 
 export async function handleSignUp(prevState: any, formData: FormData) {
@@ -10,16 +8,7 @@ export async function handleSignUp(prevState: any, formData: FormData) {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
-    const { isSignUpComplete, userId, nextStep } = await signUp({
-      username: email,
-      password,
-      options: {
-        userAttributes: {
-          email,
-        },
-        autoSignIn: true,
-      },
-    });
+    const { isSignUpComplete, userId, nextStep } = await serverSignUp(email, password, email);
 
     return {
       success: true,
@@ -40,10 +29,7 @@ export async function handleConfirmSignUp(prevState: any, formData: FormData) {
     const email = formData.get('email') as string;
     const code = formData.get('code') as string;
 
-    await confirmSignUp({
-      username: email,
-      confirmationCode: code,
-    });
+    await serverConfirmSignUp(email, code);
 
     return {
       success: true,
@@ -62,10 +48,7 @@ export async function handleSignIn(prevState: any, formData: FormData) {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
-    const { isSignedIn } = await signIn({
-      username: email,
-      password,
-    });
+    const { isSignedIn } = await serverSignIn(email, password);
 
     if (isSignedIn) {
       redirect('/dashboard');
@@ -85,7 +68,7 @@ export async function handleSignIn(prevState: any, formData: FormData) {
 
 export async function handleSignOut() {
   try {
-    await signOut();
+    await serverSignOut();
     redirect('/login');
   } catch (error: any) {
     return {
@@ -99,9 +82,7 @@ export async function handleResendCode(prevState: any, formData: FormData) {
   try {
     const email = formData.get('email') as string;
 
-    await resendSignUpCode({
-      username: email,
-    });
+    await serverResendSignUpCode(email);
 
     return {
       success: true,
