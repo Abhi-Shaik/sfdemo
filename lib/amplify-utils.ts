@@ -1,10 +1,13 @@
 import { Amplify } from 'aws-amplify';
 import outputs from '@/amplify_outputs.json';
 
-// This file is kept for backwards compatibility
-// Actual configuration happens in AmplifyProvider
+// Configure Amplify immediately when this module is imported
+// This ensures configuration happens before any component tries to use it
+Amplify.configure(outputs, {
+  ssr: true,
+});
+
 export function configureAmplify() {
-  // Configuration is handled by AmplifyProvider
   return Amplify;
 }
 

@@ -4,7 +4,6 @@ import { useActionState } from 'react';
 import { handleSignUp, handleConfirmSignUp, handleResendCode } from '@/actions/auth-actions';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import '@/lib/amplify-utils'; // Import to ensure Amplify is configured
 
 const initialState = {
   success: false,

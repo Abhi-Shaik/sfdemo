@@ -1,5 +1,5 @@
 import { createServerRunner } from '@aws-amplify/adapter-nextjs';
-import { signUp, confirmSignUp, signIn, signOut, resendSignUpCode } from 'aws-amplify/auth/server';
+import { signUp, confirmSignUp, signIn, signOut, resendSignUpCode } from 'aws-amplify/auth';
 import { cookies } from 'next/headers';
 import outputs from '@/amplify_outputs.json';
 
@@ -10,13 +10,13 @@ export const { runWithAmplifyServerContext } = createServerRunner({
 });
 
 // Server-side auth wrapper functions
-// IMPORTANT: Pass contextSpec to all auth functions for server-side operations
+// runWithAmplifyServerContext provides the context automatically
+// Auth functions work within the operation without needing contextSpec parameter
 export async function serverSignUp(username: string, password: string, email: string) {
   return await runWithAmplifyServerContext({
     nextServerContext: { cookies },
     operation: async (contextSpec) => {
-      // Pass contextSpec as first parameter for server-side auth
-      return await signUp(contextSpec, {
+      return await signUp({
         username,
         password,
         options: {
@@ -34,7 +34,7 @@ export async function serverConfirmSignUp(username: string, confirmationCode: st
   return await runWithAmplifyServerContext({
     nextServerContext: { cookies },
     operation: async (contextSpec) => {
-      return await confirmSignUp(contextSpec, {
+      return await confirmSignUp({
         username,
         confirmationCode,
       });
@@ -46,7 +46,7 @@ export async function serverSignIn(username: string, password: string) {
   return await runWithAmplifyServerContext({
     nextServerContext: { cookies },
     operation: async (contextSpec) => {
-      const result = await signIn(contextSpec, {
+      const result = await signIn({
         username,
         password,
       });
@@ -60,7 +60,7 @@ export async function serverSignOut() {
   return await runWithAmplifyServerContext({
     nextServerContext: { cookies },
     operation: async (contextSpec) => {
-      return await signOut(contextSpec);
+      return await signOut();
     },
   });
 }
@@ -69,7 +69,7 @@ export async function serverResendSignUpCode(username: string) {
   return await runWithAmplifyServerContext({
     nextServerContext: { cookies },
     operation: async (contextSpec) => {
-      return await resendSignUpCode(contextSpec, {
+      return await resendSignUpCode({
         username,
       });
     },
