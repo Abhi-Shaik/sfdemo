@@ -1,12 +1,12 @@
 import { createServerRunner } from '@aws-amplify/adapter-nextjs';
 import { signUp, confirmSignUp, signIn, signOut, resendSignUpCode } from 'aws-amplify/auth';
 import { cookies } from 'next/headers';
-import { amplifyConfig } from '@/lib/amplify-config';
+import outputs from '@/amplify_outputs.json';
 
-// Create server runner with Amplify configuration (using v6 format)
-// This handles all the configuration automatically
+// Create server runner with Amplify configuration
+// Server runner uses the original Gen2 format from amplify_outputs.json
 export const { runWithAmplifyServerContext } = createServerRunner({
-  config: amplifyConfig,
+  config: outputs,
 });
 
 // Server-side auth wrapper functions
