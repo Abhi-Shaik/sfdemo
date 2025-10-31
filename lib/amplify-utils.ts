@@ -1,9 +1,9 @@
 import { Amplify } from 'aws-amplify';
-import outputs from '@/amplify_outputs.json';
+import { amplifyConfig } from '@/lib/amplify-config';
 
 // Configure Amplify immediately when this module is imported
 // This ensures configuration happens before any component tries to use it
-Amplify.configure(outputs, {
+Amplify.configure(amplifyConfig, {
   ssr: true,
 });
 
