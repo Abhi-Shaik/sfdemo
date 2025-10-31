@@ -1,9 +1,9 @@
 import { createServerRunner } from '@aws-amplify/adapter-nextjs';
 import { cookies } from 'next/headers';
-import outputs from '@/amplify_outputs.json';
+import { amplifyConfig } from '@/lib/amplify-config';
 
 export const { runWithAmplifyServerContext } = createServerRunner({
-  config: outputs,
+  config: amplifyConfig,
 });
 
 export async function getAuthCookies() {
