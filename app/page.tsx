@@ -82,8 +82,8 @@ export default function Home() {
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">AWS Amplify Gen2</h3>
                 <p className="text-gray-600 text-sm">
                   Modern backend infrastructure with automatic deployments
-                </p>
-              </div>
+          </p>
+        </div>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-12">
@@ -97,7 +97,7 @@ export default function Home() {
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
-                >
+          >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
