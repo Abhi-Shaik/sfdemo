@@ -1,13 +1,10 @@
 import { Amplify } from 'aws-amplify';
 import outputs from '@/amplify_outputs.json';
 
-// Configure Amplify for client-side (call once)
-Amplify.configure(outputs, {
-  ssr: true, // Enable SSR mode
-});
-
+// This file is kept for backwards compatibility
+// Actual configuration happens in AmplifyProvider
 export function configureAmplify() {
-  // Already configured above, but export function for compatibility
+  // Configuration is handled by AmplifyProvider
   return Amplify;
 }
 

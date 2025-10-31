@@ -1,28 +1,20 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Amplify } from 'aws-amplify';
 import outputs from '@/amplify_outputs.json';
+import { useEffect } from 'react';
+
+// Configure Amplify immediately (synchronously) when this module loads
+Amplify.configure(outputs, {
+  ssr: true,
+});
 
 export function AmplifyProvider({ children }: { children: React.ReactNode }) {
-  const [isConfigured, setIsConfigured] = useState(false);
-
   useEffect(() => {
-    try {
-      Amplify.configure(outputs, {
-        ssr: true,
-      });
-      setIsConfigured(true);
-    } catch (error) {
-      console.error('Failed to configure Amplify:', error);
-      setIsConfigured(true); // Still render children even if config fails
-    }
+    // Amplify is already configured above
+    // This useEffect is just to ensure we're on client-side
+    console.log('Amplify configured for client-side');
   }, []);
-
-  // Show loading or return children
-  if (!isConfigured) {
-    return <div>Loading...</div>;
-  }
 
   return <>{children}</>;
 }
