@@ -1,5 +1,5 @@
 import { fetchAuthSession, fetchUserAttributes } from 'aws-amplify/auth/server';
-import { runWithAmplifyServerContext } from '@/lib/amplify-server-utils';
+import { runWithAmplifyServerContext } from '@/lib/amplify-server-client';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { handleSignOut } from '@/actions/auth-actions';
