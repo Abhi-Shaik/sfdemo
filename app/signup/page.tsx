@@ -4,6 +4,7 @@ import { useActionState } from 'react';
 import { handleSignUp, handleConfirmSignUp, handleResendCode } from '@/actions/auth-actions';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { Amplify } from 'aws-amplify';
 
 const initialState = {
   success: false,
@@ -16,6 +17,22 @@ export default function SignUpPage() {
   const [resendState, resendAction] = useActionState(handleResendCode, initialState);
   const [needsConfirmation, setNeedsConfirmation] = useState(false);
   const [email, setEmail] = useState('');
+  const [configReady, setConfigReady] = useState(false);
+
+  useEffect(() => {
+    // Check if Amplify is configured
+    try {
+      const config = Amplify.getConfig();
+      if (config.Auth?.Cognito?.userPoolId) {
+        console.log('✅ Amplify configured on Signup page');
+        setConfigReady(true);
+      } else {
+        console.error('❌ Amplify config missing Auth.Cognito');
+      }
+    } catch (error) {
+      console.error('❌ Error checking Amplify config:', error);
+    }
+  }, []);
 
   useEffect(() => {
     if (signUpState?.success && signUpState?.nextStep === 'CONFIRM_SIGN_UP') {
@@ -32,6 +49,17 @@ export default function SignUpPage() {
       }, 2000);
     }
   }, [confirmState]);
+
+  if (!configReady) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (needsConfirmation) {
     return (

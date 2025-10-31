@@ -29,11 +29,11 @@ export async function middleware(request: NextRequest) {
   }
 
   // User is not authenticated
-  if (
-    request.nextUrl.pathname !== '/login' &&
-    request.nextUrl.pathname !== '/signup' &&
-    request.nextUrl.pathname !== '/'
-  ) {
+  // Allow access to public routes and test pages
+  const publicRoutes = ['/login', '/signup', '/', '/test-auth', '/test-config'];
+  const isPublicRoute = publicRoutes.some(route => request.nextUrl.pathname.startsWith(route));
+  
+  if (!isPublicRoute) {
     // Redirect to login for protected routes
     return NextResponse.redirect(new URL('/login', request.url));
   }

@@ -3,7 +3,8 @@
 import { useActionState } from 'react';
 import { handleSignIn } from '@/actions/auth-actions';
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Amplify } from 'aws-amplify';
 
 const initialState = {
   success: false,
@@ -12,13 +13,39 @@ const initialState = {
 
 export default function LoginPage() {
   const [state, formAction] = useActionState(handleSignIn, initialState);
+  const [configReady, setConfigReady] = useState(false);
+
+  useEffect(() => {
+    // Check if Amplify is configured
+    try {
+      const config = Amplify.getConfig();
+      if (config.Auth?.Cognito?.userPoolId) {
+        console.log('✅ Amplify configured on Login page');
+        setConfigReady(true);
+      } else {
+        console.error('❌ Amplify config missing Auth.Cognito');
+      }
+    } catch (error) {
+      console.error('❌ Error checking Amplify config:', error);
+    }
+  }, []);
 
   useEffect(() => {
     if (state?.message) {
-      // You could use a toast library here
       console.log(state.message);
     }
   }, [state]);
+
+  if (!configReady) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4 sm:px-6 lg:px-8">
