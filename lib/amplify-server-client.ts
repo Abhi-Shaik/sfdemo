@@ -50,6 +50,7 @@ export async function serverSignIn(username: string, password: string) {
     nextServerContext: { cookies },
     operation: async (contextSpec) => {
       const { Amplify } = await import('aws-amplify');
+      const { fetchAuthSession } = await import('aws-amplify/auth/server');
       
       Amplify.configure(outputs, { ssr: true });
       
@@ -58,6 +59,15 @@ export async function serverSignIn(username: string, password: string) {
         username,
         password,
       });
+      
+      // CRITICAL: Fetch session to force token storage in cookies
+      if (signInResult.isSignedIn) {
+        try {
+          await fetchAuthSession(contextSpec, { forceRefresh: true });
+        } catch (error) {
+          console.error('Failed to establish session:', error);
+        }
+      }
       
       return signInResult;
     },
