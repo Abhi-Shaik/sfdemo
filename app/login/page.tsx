@@ -4,10 +4,7 @@ import { useActionState } from 'react';
 import { handleSignIn } from '@/actions/auth-actions';
 import Link from 'next/link';
 import { useEffect } from 'react';
-import { configureAmplify } from '@/lib/amplify-utils';
-
-// Configure Amplify for client-side
-configureAmplify();
+import '@/lib/amplify-utils'; // Import to ensure Amplify is configured
 
 const initialState = {
   success: false,

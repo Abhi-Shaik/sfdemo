@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { configureAmplify } from "@/lib/amplify-utils";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,8 +17,7 @@ export const metadata: Metadata = {
   description: "Full-stack application with Next.js and AWS Amplify",
 };
 
-// Configure Amplify for SSR
-configureAmplify();
+import { AmplifyProvider } from '@/components/amplify-provider';
 
 export default function RootLayout({
   children,
@@ -31,7 +29,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <AmplifyProvider>
+          {children}
+        </AmplifyProvider>
       </body>
     </html>
   );
