@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Amplify } from 'aws-amplify';
-import { signIn } from 'aws-amplify/auth';
+import { signIn, signOut, getCurrentUser } from 'aws-amplify/auth';
 import { amplifyConfig } from '@/lib/amplify-config';
 
 export default function TestAuthPage() {
@@ -24,6 +24,33 @@ export default function TestAuthPage() {
     }
   };
 
+  const testSignOut = async () => {
+    setTesting(true);
+    try {
+      addLog('');
+      addLog('🔓 Signing out...');
+      await signOut();
+      addLog('✅ Signed out successfully!');
+      addLog('You can now test sign in again.');
+    } catch (error: any) {
+      addLog(`❌ Sign out error: ${error.message}`);
+    } finally {
+      setTesting(false);
+    }
+  };
+
+  const checkCurrentUser = async () => {
+    try {
+      addLog('');
+      addLog('👤 Checking current user...');
+      const user = await getCurrentUser();
+      addLog(`✅ User is signed in: ${user.username}`);
+      addLog(`User ID: ${user.userId}`);
+    } catch (error: any) {
+      addLog('❌ No user signed in');
+    }
+  };
+
   const testLogin = async () => {
     setTesting(true);
     try {
@@ -37,11 +64,21 @@ export default function TestAuthPage() {
       
       addLog(`✅ Sign in result: ${JSON.stringify(result, null, 2)}`);
       addLog(`Is signed in: ${result.isSignedIn}`);
+      addLog('');
+      addLog('🎉 SUCCESS! Authentication is working!');
       
     } catch (error: any) {
-      addLog(`❌ Login error: ${error.message}`);
-      addLog(`Error name: ${error.name}`);
-      addLog(`Full error: ${JSON.stringify(error, null, 2)}`);
+      if (error.name === 'UserAlreadyAuthenticatedException') {
+        addLog('');
+        addLog('✅ GOOD NEWS! You are already signed in!');
+        addLog('🎉 This means authentication is WORKING PERFECTLY!');
+        addLog('');
+        addLog('To test login again, click "Sign Out" first.');
+      } else {
+        addLog(`❌ Login error: ${error.message}`);
+        addLog(`Error name: ${error.name}`);
+        addLog(`Full error: ${JSON.stringify(error, null, 2)}`);
+      }
     } finally {
       setTesting(false);
     }
@@ -57,7 +94,7 @@ export default function TestAuthPage() {
     <div className="min-h-screen bg-gray-900 text-green-400 p-8 font-mono">
       <h1 className="text-2xl mb-4">🧪 Amplify Auth Test</h1>
       
-      <div className="mb-4 space-x-4">
+      <div className="mb-4 flex flex-wrap gap-2">
         <button
           onClick={testConfiguration}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
@@ -65,11 +102,25 @@ export default function TestAuthPage() {
           Test Configuration
         </button>
         <button
+          onClick={checkCurrentUser}
+          disabled={testing}
+          className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded disabled:opacity-50"
+        >
+          Check User
+        </button>
+        <button
           onClick={testLogin}
           disabled={testing}
           className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded disabled:opacity-50"
         >
           {testing ? 'Testing...' : 'Test Login'}
+        </button>
+        <button
+          onClick={testSignOut}
+          disabled={testing}
+          className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded disabled:opacity-50"
+        >
+          {testing ? 'Signing out...' : 'Sign Out'}
         </button>
         <button
           onClick={() => setLogs([])}
